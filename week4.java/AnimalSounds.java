@@ -1,4 +1,4 @@
-// File: AnimalSounds.java
+
 
 // Base class
 class Animal {
