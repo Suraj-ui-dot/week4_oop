@@ -1,4 +1,4 @@
-// File: BankSystem.java
+
 
 class BankAccount {
     private String accountNumber;
@@ -96,13 +96,10 @@ public class BankSystem {
         // Add interest
         myAccount.addInterest();
 
-        // Try withdrawing within allowed limit
         myAccount.withdraw(1000);
 
-        // Try withdrawing below minimum balance
         myAccount.withdraw(1200);
 
-        // Final balance
         System.out.println("Final Balance: " + myAccount.getBalance());
     }
 }
