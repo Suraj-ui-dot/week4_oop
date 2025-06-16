@@ -77,8 +77,8 @@ public class LibrarySystem {
     public static void main(String[] args) {
         LibraryItem[] catalog = new LibraryItem[3];
 
-        catalog[0] = new Book("Effective Java", "Joshua Bloch", 1);
-        catalog[1] = new Magazine("National Geographic", "Various", 2, 202, "Monthly");
+        catalog[0] = new Book("fundamental", "Joshua Bloch", 1);
+        catalog[1] = new Magazine("kantipur", "Various", 2, 202, "Monthly");
         catalog[2] = new Newspaper("The New York Times", "NYT Editorial", 3, "2025-06-10");
 
         for (LibraryItem item : catalog) {
