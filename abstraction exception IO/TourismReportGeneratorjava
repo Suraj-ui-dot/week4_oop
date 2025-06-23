@@ -1,0 +1,123 @@
+import java.util.*;
+
+// Custom checked exceptions
+class DataSourceAccessException extends Exception {
+    public DataSourceAccessException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}
+
+class ConnectionLostException extends Exception {
+    public ConnectionLostException(String message) {
+        super(message);
+    }
+}
+
+class AuthenticationFailedException extends Exception {
+    public AuthenticationFailedException(String message) {
+        super(message);
+    }
+}
+
+class DataProcessingException extends Exception {
+    public DataProcessingException(String message) {
+        super(message);
+    }
+}
+
+class EmptyDataException extends DataProcessingException {
+    public EmptyDataException(String message) {
+        super(message);
+    }
+}
+
+// Interface for processing data
+interface DataProcessor {
+    List<String> process(List<String> rawData) throws DataProcessingException;
+}
+
+// Base abstract class
+abstract class TouristDataSource {
+    protected String sourceName;
+
+    public abstract List<String> fetchData() throws DataSourceAccessException;
+}
+
+// Concrete DataSource 1
+class AirportArrivalsDataSource extends TouristDataSource {
+    public AirportArrivalsDataSource() {
+        this.sourceName = "Airport Arrivals";
+    }
+
+    @Override
+    public List<String> fetchData() throws DataSourceAccessException {
+        throw new DataSourceAccessException("Connection lost", new ConnectionLostException("Airport network failure"));
+    }
+}
+
+// Concrete DataSource 2
+class HotelRegistrationsDataSource extends TouristDataSource {
+    public HotelRegistrationsDataSource() {
+        this.sourceName = "Kathmandu Hotels Registrations";
+    }
+
+    @Override
+    public List<String> fetchData() throws DataSourceAccessException {
+        List<String> data = new ArrayList<>();
+        data.add("Visitor: Suraj Khanal");
+        data.add("Visitor: Anjali Sharma");
+        return data;
+    }
+}
+
+// Concrete DataProcessor
+class UniqueVisitorCounter implements DataProcessor {
+    @Override
+    public List<String> process(List<String> rawData) throws DataProcessingException {
+        if (rawData == null || rawData.isEmpty()) {
+            throw new EmptyDataException("No data to process");
+        }
+
+        Set<String> uniqueVisitors = new HashSet<>(rawData);
+        return new ArrayList<>(uniqueVisitors);
+    }
+}
+
+// Main class
+public class TourismReportGenerator {
+    public static void generateOverallReport(List<TouristDataSource> dataSources, DataProcessor processor) {
+        System.out.println("Generating overall tourism report...");
+        for (TouristDataSource dataSource : dataSources) {
+            List<String> data = null;
+            try {
+                data = dataSource.fetchData();
+            } catch (DataSourceAccessException e) {
+                System.out.println("Could not fetch data from " + dataSource.sourceName + ": " + e.getMessage() + ". Skipping this source.");
+                if (e.getCause() != null) {
+                    System.out.println("Reason: " + e.getCause().getMessage());
+                }
+                continue;
+            } finally {
+                System.out.println("Data handling from " + dataSource.sourceName + " completed.");
+            }
+
+            try {
+                List<String> processedData = processor.process(data);
+                System.out.println("Processed Data from " + dataSource.sourceName + ": " + processedData);
+            } catch (DataProcessingException e) {
+                System.out.println("Error processing data from " + dataSource.sourceName + ": " + e.getMessage() + ". Skipping this data.");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        List<TouristDataSource> dataSources = new ArrayList<>();
+        dataSources.add(new AirportArrivalsDataSource()); // Will throw exception
+        dataSources.add(new HotelRegistrationsDataSource()); // Will succeed
+
+        DataProcessor processor = new UniqueVisitorCounter();
+
+        generateOverallReport(dataSources, processor);
+    }
+}
+
